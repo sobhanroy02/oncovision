@@ -1,0 +1,121 @@
+.hero {
+  background: linear-gradient(135deg, #1A3C6E 0%, #0D7377 100%);
+  color: white;
+  padding: 80px 0 64px;
+}
+.hero-inner { text-align: center; }
+.hero-title {
+  color: white;
+  font-size: 3rem;
+  margin: 0 0 12px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+.hero-subtitle {
+  font-size: 1.2rem;
+  color: rgba(255, 255, 255, 0.9);
+  max-width: 720px;
+  margin: 0 auto 32px;
+}
+.hero-buttons {
+  display: flex;
+  gap: 16px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+.btn-outline-on-dark {
+  background: transparent;
+  color: white;
+  border: 2px solid rgba(255, 255, 255, 0.5);
+}
+.btn-outline-on-dark:hover { background: rgba(255, 255, 255, 0.1); }
+
+@media (max-width: 600px) {
+  .hero-title { font-size: 2rem; }
+  .hero-subtitle { font-size: 1rem; }
+  .hero { padding: 48px 0 40px; }
+}
+
+.section { padding: 64px 0 0; }
+.section-title {
+  text-align: center;
+  font-size: 1.8rem;
+  margin-bottom: 32px;
+}
+
+.section-title-left {
+  text-align: left;
+}
+
+.dashboard-preview {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  background: linear-gradient(135deg, rgba(26, 60, 110, 0.07), rgba(13, 115, 119, 0.07));
+}
+
+.dashboard-preview-actions {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.dashboard-preview-copy {
+  margin-bottom: 0;
+  max-width: 760px;
+}
+
+.section-kicker {
+  display: inline-block;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--color-secondary);
+  margin-bottom: 10px;
+}
+
+@media (max-width: 900px) {
+  .dashboard-preview {
+    display: grid;
+  }
+  .dashboard-preview-actions {
+    justify-content: flex-start;
+  }
+}
+
+.cancer-card {
+  text-decoration: none;
+  color: var(--color-text);
+  display: block;
+  transition: all 0.2s ease;
+  text-align: center;
+  padding: 32px 24px;
+}
+.cancer-card:hover {
+  text-decoration: none;
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-lg);
+}
+.cancer-icon { font-size: 3rem; margin-bottom: 12px; }
+.blood-card   { border-top: 4px solid #E74C3C; }
+.uterine-card { border-top: 4px solid #0D7377; }
+
+.step { padding: 24px 16px; }
+.step-num {
+  width: 48px;
+  height: 48px;
+  margin: 0 auto 12px;
+  border-radius: 50%;
+  background: var(--color-primary);
+  color: white;
+  font-size: 1.4rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.step h4 { font-size: 1.05rem; margin: 0 0 6px; }
+.step p  { margin: 0; font-size: 0.9rem; }

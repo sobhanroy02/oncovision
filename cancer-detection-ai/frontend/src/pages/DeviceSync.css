@@ -1,0 +1,718 @@
+/* ============================================================
+   Device Sync page styles - Virtual IoT Monitor Simulator
+   ============================================================ */
+
+.iot-hero {
+  margin-bottom: 24px;
+  background: linear-gradient(135deg, var(--color-primary) 0%, #0d274c 100%);
+  color: white;
+  border: none;
+}
+
+.iot-hero h1 {
+  color: white;
+}
+
+.iot-subtitle {
+  color: rgba(255, 255, 255, 0.8) !important;
+}
+
+.hero-links {
+  display: flex;
+  gap: 12px;
+}
+
+.workspace-grid {
+  grid-template-columns: 1.1fr 0.9fr;
+}
+
+@media (max-width: 900px) {
+  .workspace-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ============================================================
+   Hardware IoT Chassis & Screen
+   ============================================================ */
+
+.iot-chassis {
+  background: #334155; /* Slate steel grey bezel */
+  border-radius: var(--radius-lg);
+  padding: 16px;
+  box-shadow: inset 0 2px 4px rgba(255,255,255,0.2), 0 10px 25px rgba(0,0,0,0.4);
+  border: 4px solid #1e293b;
+}
+
+.chassis-inner {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* Device Status LEDs */
+.device-header-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  color: #94a3b8;
+  font-family: monospace;
+  font-size: 0.75rem;
+  padding: 0 4px;
+}
+
+.device-leds {
+  display: flex;
+  gap: 8px;
+}
+
+.led {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #64748b;
+  box-shadow: inset 0 1px 2px rgba(0,0,0,0.5);
+  transition: all 0.3s ease;
+}
+
+.led-power.on {
+  background: #ef4444; /* Glowing Red Power LED */
+  box-shadow: 0 0 8px #ef4444, inset 0 1px 1px white;
+}
+
+.led-ble.on {
+  background: #3b82f6; /* Glowing Blue BLE LED */
+  box-shadow: 0 0 8px #3b82f6, inset 0 1px 1px white;
+}
+
+.led-ble.blink {
+  animation: bleBlink 1s infinite alternate;
+}
+
+@keyframes bleBlink {
+  0% { background: #64748b; box-shadow: none; }
+  100% { background: #3b82f6; box-shadow: 0 0 8px #3b82f6; }
+}
+
+/* LCD Monitor Screen */
+.device-lcd-screen {
+  background: #020617; /* Dark black screen */
+  height: 360px;
+  border-radius: 8px;
+  border: 3px solid #0f172a;
+  box-shadow: inset 0 0 20px rgba(0,0,0,0.8);
+  padding: 16px;
+  overflow: hidden;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+}
+
+.device-lcd-screen.blackout {
+  background: #000000;
+  box-shadow: none;
+  border-color: #000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.screen-off-state {
+  text-align: center;
+  color: #334155;
+}
+
+.screen-off-state h3 {
+  color: #475569;
+  font-family: monospace;
+  letter-spacing: 2px;
+  margin-bottom: 6px;
+}
+
+.screen-off-state p {
+  font-size: 0.85rem;
+}
+
+/* LCD ON State */
+.screen-on-layout {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.screen-telemetry-header {
+  display: flex;
+  justify-content: space-between;
+  color: #38bdf8; /* light blue */
+  font-family: monospace;
+  font-size: 0.75rem;
+  margin-bottom: 8px;
+}
+
+/* ECG Graph Animation */
+.screen-graph-area {
+  height: 60px;
+  background: rgba(15, 23, 42, 0.5);
+  border: 1px solid #1e293b;
+  border-radius: 4px;
+  margin-bottom: 12px;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.wave-active, .wave-idle {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.ecg-svg {
+  width: 100%;
+  height: 40px;
+}
+
+.ecg-path {
+  fill: none;
+  stroke: #22c55e; /* Glowing Green pulse line */
+  stroke-width: 2;
+  stroke-dasharray: 600;
+  stroke-dashoffset: 600;
+  animation: pulseDraw 2.5s linear infinite;
+}
+
+.wave-caption {
+  font-size: 0.65rem;
+  color: #64748b;
+  font-family: monospace;
+}
+
+@keyframes pulseDraw {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+/* Parameter Display Grid */
+.screen-parameters-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.param-box {
+  background: #0f172a;
+  border: 1px solid #334155;
+  border-radius: 4px;
+  padding: 6px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  box-shadow: inset 0 0 10px rgba(0,0,0,0.5);
+}
+
+.param-box .lbl {
+  font-family: monospace;
+  font-size: 0.65rem;
+  color: #64748b;
+}
+
+.param-box .val {
+  font-family: monospace;
+  font-size: 1.15rem;
+  color: #00ffff; /* Neon cyan */
+  text-shadow: 0 0 5px rgba(0,255,255,0.4);
+}
+
+/* Progress bar inside screen */
+.screen-progress {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.prog-bar {
+  flex: 1;
+  height: 6px;
+  background: #22c55e;
+  border-radius: 3px;
+  transition: width 0.15s ease;
+  box-shadow: 0 0 6px #22c55e;
+}
+
+.prog-percent {
+  font-family: monospace;
+  font-size: 0.75rem;
+  color: #22c55e;
+}
+
+/* Scrolling Terminal Console logs */
+.screen-terminal-console {
+  flex: 1;
+  background: #020617;
+  border: 1px solid #1e293b;
+  border-radius: 4px;
+  padding: 8px;
+  overflow-y: auto;
+  font-family: monospace;
+  font-size: 0.7rem;
+  color: #22c55e; /* Glowing green terminal text */
+  text-shadow: 0 0 2px rgba(34, 197, 94, 0.4);
+  line-height: 1.3;
+}
+
+.console-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.log-line {
+  white-space: pre-wrap;
+}
+
+/* Physical Hardware Control Buttons */
+.device-buttons-panel {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+  margin-top: 4px;
+}
+
+.hw-btn {
+  padding: 10px 4px;
+  font-family: monospace;
+  font-size: 0.75rem;
+  font-weight: 700;
+  border-radius: 6px;
+  text-align: center;
+  transition: all 0.2s ease;
+  box-shadow: 0 3px 0 #0f172a, 0 4px 6px rgba(0,0,0,0.3);
+  border: 1px solid #475569;
+}
+
+.hw-btn:active {
+  transform: translateY(3px);
+  box-shadow: none;
+}
+
+.hw-btn-power {
+  background: #dc2626; /* Crimson Red */
+  color: white;
+  border-color: #991b1b;
+}
+.hw-btn-power:hover { background: #b91c1c; }
+
+.hw-btn-pair {
+  background: #1e3a8a; /* Deep blue */
+  color: white;
+  border-color: #172554;
+}
+.hw-btn-pair:hover:not(:disabled) { background: #1e40af; }
+.hw-btn-pair.active { background: #2563eb; box-shadow: 0 0 8px #2563eb; }
+
+.hw-btn-scan {
+  background: #14532d; /* Dark green */
+  color: white;
+  border-color: #052e16;
+}
+.hw-btn-scan:hover:not(:disabled) { background: #166534; }
+.hw-btn-scan.active { background: #22c55e; box-shadow: 0 0 8px #22c55e; }
+
+.hw-btn-sync {
+  background: #115e59; /* Dark teal */
+  color: white;
+  border-color: #134e4a;
+}
+.hw-btn-sync:hover:not(:disabled) { background: #0f766e; }
+.hw-btn-sync.ready { background: #0d7377; box-shadow: 0 0 8px #0d7377; }
+
+.hw-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: 0 3px 0 #0f172a;
+}
+
+/* ============================================================
+   Preset Configuration Panel
+   ============================================================ */
+
+.configure-panel {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  border: 1px solid var(--color-border);
+}
+
+.preset-selector-row {
+  margin: 14px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.preset-selector-row label {
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: var(--color-primary);
+}
+
+.profile-select {
+  padding: 8px 12px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--color-border);
+  background: #f8fafc;
+  font-weight: 550;
+  color: var(--color-text);
+  outline: none;
+}
+
+.profile-select:focus {
+  border-color: var(--color-primary);
+}
+
+.json-editor-area {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 14px;
+}
+
+.json-editor-area label {
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: var(--color-primary);
+}
+
+.json-textarea {
+  flex: 1;
+  min-height: 180px;
+  font-family: monospace;
+  font-size: 0.85rem;
+  padding: 12px;
+  background: #f8fafc;
+  border: 1.5px solid var(--color-border);
+  border-radius: var(--radius-md);
+  color: #334155;
+  resize: none;
+}
+
+.json-textarea:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(26, 60, 110, 0.1);
+}
+
+.error-banner {
+  background: #fee2e2;
+  color: #991b1b;
+  border: 1px solid #fca5a5;
+  padding: 8px 12px;
+  border-radius: 4px;
+  font-size: 0.8rem;
+  margin-top: 8px;
+}
+
+.hardware-info-chip {
+  background: #eef2f6;
+  border-radius: var(--radius-md);
+  padding: 12px;
+  border-left: 4px solid var(--color-accent);
+}
+
+.hardware-info-chip h4 {
+  font-size: 0.9rem;
+  margin-bottom: 4px;
+  color: var(--color-primary);
+}
+
+.hardware-info-chip p {
+  font-size: 0.8rem;
+  color: var(--color-muted);
+  margin: 0;
+  line-height: 1.4;
+}
+
+/* ============================================================
+   Cloud Phasing Loading State
+   ============================================================ */
+
+.phasing-loading-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 36px 0;
+  text-align: center;
+  border: 1.5px dashed var(--color-accent);
+}
+
+.loading-spinner-ring {
+  width: 44px;
+  height: 44px;
+  border: 4px solid #e2e8f0;
+  border-top-color: var(--color-accent);
+  border-radius: 50%;
+  animation: spinnerAnim 1s linear infinite;
+  margin-bottom: 16px;
+}
+
+@keyframes spinnerAnim {
+  to { transform: rotate(360deg); }
+}
+
+/* ============================================================
+   Computed Analysis Report
+   ============================================================ */
+
+.analysis-report-card {
+  box-shadow: var(--shadow-lg);
+  border: 1px solid var(--color-border);
+}
+
+.report-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 2px solid var(--color-border);
+  padding-bottom: 16px;
+}
+
+.report-title-kicker {
+  font-family: monospace;
+  font-size: 0.8rem;
+  color: var(--color-muted);
+}
+
+.verdict-badge {
+  display: inline-block;
+  padding: 8px 18px;
+  border-radius: 6px;
+  font-weight: 700;
+  text-transform: uppercase;
+  font-size: 0.9rem;
+  letter-spacing: 0.5px;
+}
+
+.verdict-stable {
+  background: #d1fae5;
+  color: #065f46;
+  border: 1.5px solid #34d399;
+}
+
+.verdict-needs-review {
+  background: #fef3c7;
+  color: #92400e;
+  border: 1.5px solid #fbbf24;
+}
+
+.verdict-critical {
+  background: #fee2e2;
+  color: #991b1b;
+  border: 1.5px solid #fca5a5;
+  box-shadow: 0 0 10px rgba(239, 68, 68, 0.15);
+}
+
+/* Radar Score & Risk Panel Columns */
+.report-metrics-summary {
+  grid-template-columns: 0.7fr 1.15fr 1.15fr;
+  align-items: center;
+  gap: 20px;
+}
+
+@media (max-width: 850px) {
+  .report-metrics-summary {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Circular Score Gauge */
+.gauge-score-box {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.circular-progress {
+  position: relative;
+  width: 140px;
+  height: 140px;
+}
+
+.radial-svg {
+  transform: rotate(-90deg);
+  width: 100%;
+  height: 100%;
+}
+
+.radial-bg-circle {
+  fill: none;
+  stroke: #e2e8f0;
+  stroke-width: 8;
+}
+
+.radial-fill-circle {
+  fill: none;
+  stroke-width: 8;
+  stroke-linecap: round;
+  transition: stroke-dashoffset 0.6s ease;
+}
+
+.radial-fill-circle.score-stable { stroke: var(--color-success); }
+.radial-fill-circle.score-needs-review { stroke: var(--color-warning); }
+.radial-fill-circle.score-critical { stroke: var(--color-danger); }
+
+.gauge-text {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+}
+
+.gauge-text strong {
+  font-size: 2.25rem;
+  line-height: 1;
+  color: var(--color-primary);
+}
+
+.gauge-text span {
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  color: var(--color-muted);
+  font-weight: 600;
+  letter-spacing: 0.5px;
+}
+
+/* Risk Detail Boxes */
+.risk-panel-box {
+  background: #f8fafc;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: 16px;
+  height: 100%;
+}
+
+.risk-header-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.risk-header-row h3 {
+  font-size: 1rem;
+  margin: 0;
+}
+
+.risk-pill {
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  padding: 2px 8px;
+  border-radius: 4px;
+}
+
+.risk-pill.risk-low { background: #d1fae5; color: #065f46; }
+.risk-pill.risk-medium { background: #fef3c7; color: #92400e; }
+.risk-pill.risk-high { background: #fee2e2; color: #991b1b; }
+.risk-pill.risk-borderline { background: #e0f2fe; color: #0369a1; }
+
+.risk-confidence {
+  font-size: 0.8rem;
+  color: var(--color-text);
+}
+
+.risk-description {
+  font-size: 0.82rem;
+  color: var(--color-muted);
+  line-height: 1.4;
+}
+
+/* Explainability attribution (SHAP Panel) */
+.shap-card-panel {
+  background: white;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: 20px;
+}
+
+.shap-card-panel h3 {
+  font-size: 1.15rem;
+  margin-bottom: 4px;
+}
+
+.shap-bars-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.shap-bar-item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.shap-bar-label {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.82rem;
+  color: var(--color-text);
+}
+
+.shap-bar-track {
+  height: 8px;
+  background: #e2e8f0;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.shap-bar-fill {
+  height: 100%;
+  border-radius: 4px;
+}
+
+.shap-bar-fill.fill-stable { background: var(--color-success); }
+.shap-bar-fill.fill-needs-review { background: var(--color-warning); }
+.shap-bar-fill.fill-critical { background: var(--color-danger); }
+
+.shap-bar-pct {
+  align-self: flex-end;
+  font-size: 0.72rem;
+  color: var(--color-muted);
+  font-family: monospace;
+}
+
+/* Recommendations Action Panel */
+.clinical-actions-panel {
+  background: white;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: 20px;
+}
+
+.clinical-actions-panel h3 {
+  font-size: 1.15rem;
+  margin-bottom: 4px;
+}
+
+.actions-list {
+  padding-left: 18px;
+  margin: 0;
+}
+
+.action-item-bullet {
+  font-size: 0.85rem;
+  color: var(--color-text);
+  margin-bottom: 8px;
+  line-height: 1.45;
+}

@@ -1,0 +1,32 @@
+.about-section { margin-bottom: 48px; }
+.about-section h2 {
+  border-left: 4px solid var(--color-accent);
+  padding-left: 12px;
+  margin-bottom: 16px;
+}
+
+.disclaimer {
+  background: #FEF3C7;
+  color: #92400E;
+  border-left: 4px solid var(--color-warning);
+  padding: 16px;
+  border-radius: var(--radius-sm);
+  font-size: 0.95rem;
+  margin: 0;
+}
+
+.tech-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 12px;
+}
+.tech-pill {
+  background: white;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: 12px 16px;
+  display: flex;
+  flex-direction: column;
+}
+.tech-pill strong { color: var(--color-primary); }
+.tech-pill span   { font-size: 0.85rem; margin-top: 2px; }

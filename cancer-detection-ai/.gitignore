@@ -1,0 +1,92 @@
+# ===================================================================
+# Large dataset folders - NEVER commit these (too large for git)
+# ===================================================================
+data/raw/
+data/processed/
+data/cache/
+*.zip
+*.tar.gz
+
+# ===================================================================
+# Trained model files (keep small ones, ignore large)
+# ===================================================================
+backend/models/*.h5
+backend/models/*.keras
+backend/models/*.pb
+backend/models/checkpoints/
+!backend/models/*.json
+
+# ===================================================================
+# Python
+# ===================================================================
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+venv/
+env/
+ENV/
+.venv/
+
+# ===================================================================
+# Environment / secrets
+# ===================================================================
+.env
+.env.local
+.env.*.local
+secrets.json
+
+# ===================================================================
+# Node / React frontend
+# ===================================================================
+node_modules/
+frontend/build/
+frontend/dist/
+frontend/.next/
+frontend/coverage/
+
+# ===================================================================
+# Jupyter / Notebooks
+# ===================================================================
+.ipynb_checkpoints/
+*.ipynb_checkpoints
+notebooks/.ipynb_checkpoints/
+
+# ===================================================================
+# IDE / Editor
+# ===================================================================
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+
+# ===================================================================
+# Logs and temporary files
+# ===================================================================
+*.log
+logs/
+tmp/
+temp/
+*.tmp
+*.bak
+
+# ===================================================================
+# Results / generated plots (keep .gitkeep)
+# ===================================================================
+backend/results/*.png
+backend/results/*.jpg
+backend/results/*.csv
+backend/results/*.json
+!backend/results/.gitkeep
+!backend/results/model_comparison.json
+
+# ===================================================================
+# OS specific
+# ===================================================================
+.DS_Store
+.directory
+Desktop.ini

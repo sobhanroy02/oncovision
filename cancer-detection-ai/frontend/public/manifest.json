@@ -1,0 +1,15 @@
+{
+  "short_name": "CancerDetect AI",
+  "name": "AI Cancer Detection System",
+  "icons": [
+    {
+      "src": "favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml"
+    }
+  ],
+  "start_url": ".",
+  "display": "standalone",
+  "theme_color": "#1A3C6E",
+  "background_color": "#F8FAFC"
+}

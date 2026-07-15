@@ -1,0 +1,38 @@
+{
+  "models": [
+    {
+      "name": "EfficientNetV2B0 (Blood Cancer)",
+      "cancer_type": "blood",
+      "architecture": "EfficientNetV2B0",
+      "metrics": {
+        "accuracy": 0.94,
+        "sensitivity": 0.6,
+        "specificity": 0.88,
+        "precision": 0.8333333333333334,
+        "f1_score": 0.6976744186046512,
+        "auc_roc": 0.7828
+      }
+    },
+    {
+      "name": "EfficientNetV2B1 (Uterine Cancer)",
+      "cancer_type": "uterine",
+      "architecture": "EfficientNetV2B1",
+      "metrics": {
+        "accuracy": 0.91,
+        "sensitivity": 0.0,
+        "specificity": 1.0,
+        "precision": 0.0,
+        "f1_score": 0.0,
+        "auc_roc": 0.5191256830601093
+      }
+    }
+  ],
+  "metric_descriptions": {
+    "accuracy": "Overall correct predictions",
+    "sensitivity": "True positive rate (cancer correctly identified)",
+    "specificity": "True negative rate (normal correctly identified)",
+    "precision": "Of predicted cancers, how many are real",
+    "f1_score": "Harmonic mean of precision and sensitivity",
+    "auc_roc": "Area under the ROC curve"
+  }
+}

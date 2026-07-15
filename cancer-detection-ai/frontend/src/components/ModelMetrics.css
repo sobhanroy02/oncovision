@@ -1,0 +1,39 @@
+.model-card {
+  text-align: center;
+}
+.model-name {
+  font-size: 1.15rem;
+  margin: 0 0 4px;
+}
+.model-arch {
+  font-size: 0.85rem;
+  margin: 0 0 16px;
+}
+
+.metric-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 8px;
+}
+@media (max-width: 600px) {
+  .metric-grid { grid-template-columns: repeat(2, 1fr); }
+}
+
+.metric-item {
+  background: #F8FAFC;
+  border-radius: var(--radius-sm);
+  padding: 12px 4px;
+}
+
+.metric-num {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--color-primary);
+}
+.metric-name {
+  font-size: 0.75rem;
+  color: var(--color-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-top: 2px;
+}

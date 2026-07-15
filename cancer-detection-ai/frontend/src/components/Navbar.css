@@ -1,0 +1,110 @@
+.navbar {
+  background: var(--color-primary);
+  color: white;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  box-shadow: var(--shadow-md);
+}
+
+.nav-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 24px;
+}
+
+.nav-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: white;
+  font-weight: 700;
+  font-size: 1.2rem;
+  text-decoration: none;
+}
+.nav-brand:hover { text-decoration: none; }
+
+.logo-dot {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--color-danger);
+  display: inline-block;
+  box-shadow: 0 0 0 3px rgba(231, 76, 60, 0.25);
+}
+
+.nav-links {
+  display: flex;
+  align-items: center;
+  gap: 28px;
+}
+
+.nav-link {
+  color: rgba(255, 255, 255, 0.85);
+  text-decoration: none;
+  font-weight: 500;
+  font-size: 0.95rem;
+  padding: 6px 0;
+  border-bottom: 2px solid transparent;
+  transition: all 0.15s ease;
+}
+.nav-link:hover { color: white; text-decoration: none; }
+.nav-link.active {
+  color: white;
+  border-bottom-color: var(--color-accent);
+}
+
+.nav-status {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.85rem;
+  padding: 4px 12px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  display: inline-block;
+}
+.status-dot.online  { background: var(--color-success); box-shadow: 0 0 0 3px rgba(39, 174, 96, 0.25); }
+.status-dot.offline { background: var(--color-danger);  box-shadow: 0 0 0 3px rgba(231, 76, 60, 0.25); }
+
+.status-text { color: rgba(255, 255, 255, 0.9); }
+
+.nav-toggle {
+  display: none;
+  flex-direction: column;
+  background: transparent;
+  gap: 5px;
+  padding: 8px;
+}
+.nav-toggle .bar {
+  width: 24px;
+  height: 2px;
+  background: white;
+  border-radius: 2px;
+  transition: 0.2s;
+}
+
+@media (max-width: 800px) {
+  .nav-toggle  { display: flex; }
+  .nav-links {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: var(--color-primary);
+    flex-direction: column;
+    gap: 16px;
+    padding: 24px;
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease;
+  }
+  .nav-links.open { max-height: 400px; }
+}

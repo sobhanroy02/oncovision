@@ -1,0 +1,20 @@
+.global-loading-wrap {
+  position: relative;
+  min-height: 200px;
+}
+.global-loading-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(255, 255, 255, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+  border-radius: var(--radius-lg);
+  backdrop-filter: blur(2px);
+}
+.global-loading-content {
+  filter: blur(1px);
+  pointer-events: none;
+  opacity: 0.7;
+}

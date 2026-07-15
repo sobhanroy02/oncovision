@@ -1,0 +1,24 @@
+# Core Deep Learning
+tensorflow>=2.10
+numpy
+pandas
+matplotlib
+seaborn
+scikit-learn
+
+# Image Processing
+opencv-python
+Pillow
+
+# Explainability
+shap
+
+# Backend API
+flask
+flask-cors
+
+# Medical Datasets
+medmnist
+
+# YOLOv11 (Ultralytics) — third 'best medical' model
+ultralytics>=8.0.0
