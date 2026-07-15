@@ -125,93 +125,147 @@ function Detect() {
   const currentSamples = samples[cancerType] || [];
 
   return (
-    <div className="page">
-      <div className="container">
-        <h1 className="page-title">Upload Image for Analysis</h1>
-        <p className="page-subtitle">
-          Upload a medical image or pick a sample — our AI will classify it
-          and explain its decision.
-        </p>
+    <div className="page detect-page">
+      <div className="container page-shell">
+        <header className="page-header detect-hero card">
+          <div className="page-header-row">
+            <div>
+              <div className="page-breadcrumb">Patient Portal / AI Detection</div>
+              <h1 className="page-title">Upload Image for Analysis</h1>
+              <p className="page-subtitle">
+                Drop a scan, choose the cancer type, and review an explainable clinical result with a workflow designed for hospital use.
+              </p>
+            </div>
+            <div className="page-meta-row">
+              <span className="page-meta-chip">Secure upload</span>
+              <span className="page-meta-chip">Explainable AI</span>
+              <span className="page-meta-chip">Local history</span>
+            </div>
+          </div>
 
-        <div className="report-strip card mb-3">
+          <div className="detect-hero-actions">
+            <a className="btn btn-secondary" href="/dashboard">Open Dashboard</a>
+            <a className="btn btn-outline" href="/health-hub">View Health Hub</a>
+          </div>
+        </header>
+
+        <section className="report-strip card">
           <div>
-            <h3 className="report-strip-title">Daily health report is on</h3>
+            <span className="section-kicker">Workflow status</span>
+            <h3 className="report-strip-title">Daily monitoring is on</h3>
             <p className="report-strip-copy">
-              Every analysis is saved locally so you can review recent screenings,
-              track risk levels, and revisit today’s health summary in the dashboard.
+              Every analysis is saved locally so you can review recent screenings, track risk levels, and revisit today’s health summary in the dashboard.
             </p>
           </div>
           <a className="btn btn-secondary" href="/dashboard">Open Dashboard</a>
-        </div>
+        </section>
 
-        {/* Cancer-type selector */}
-        <div className="type-selector">
-          <button
-            className={`type-btn ${cancerType === 'blood'   ? 'active blood'   : ''}`}
-            onClick={() => setCancerType('blood')}
-          >🩸 Blood Cancer (ALL)</button>
-          <button
-            className={`type-btn ${cancerType === 'uterine' ? 'active uterine' : ''}`}
-            onClick={() => setCancerType('uterine')}
-          >🔬 Uterine Cancer</button>
-        </div>
-
-        {/* Uploader + actions */}
-        <div className="upload-section card mt-3">
-          <ImageUploader
-            onFileSelected={handleFile}
-            previewUrl={previewUrl}
-            onClear={handleClear}
-          />
-
-          {error && <p className="error-msg mt-2">{error}</p>}
-
-          <div className="action-row mt-3">
-            <button
-              className="btn btn-primary"
-              onClick={handleAnalyze}
-              disabled={!file || loading}
-            >
-              {loading ? 'Analyzing...' : 'Analyze Image'}
-            </button>
-
-            <div className="sample-dropdown">
-              <button
-                className="btn btn-outline"
-                onClick={() => setSampleMenuOpen((o) => !o)}
-                disabled={loading}
-              >
-                Use Sample Image ▾
-              </button>
-              {sampleMenuOpen && (
-                <div className="sample-menu">
-                  {currentSamples.length === 0 ? (
-                    <div className="sample-empty">
-                      No sample images available yet.
-                    </div>
-                  ) : (
-                    currentSamples.map((s) => (
-                      <button
-                        key={s.filename}
-                        className="sample-item"
-                        onClick={() => pickSample(s)}
-                      >
-                        <span className="sample-name">{s.filename}</span>
-                        <span className="sample-label">({s.label})</span>
-                      </button>
-                    ))
-                  )}
-                </div>
-              )}
+        <section className="type-selector-card card">
+          <div className="type-selector-head">
+            <div>
+              <span className="section-kicker">Cancer type</span>
+              <h2>Choose the analysis track</h2>
             </div>
           </div>
-        </div>
+          <div className="type-selector">
+            <button
+              className={`type-btn ${cancerType === 'blood' ? 'active blood' : ''}`}
+              onClick={() => setCancerType('blood')}
+            >🩸 Blood Cancer (ALL)</button>
+            <button
+              className={`type-btn ${cancerType === 'uterine' ? 'active uterine' : ''}`}
+              onClick={() => setCancerType('uterine')}
+            >🔬 Uterine Cancer</button>
+          </div>
+        </section>
 
-        {/* Results */}
-        <div ref={resultsRef} className="results-section mt-4">
+        <section className="upload-layout grid grid-2">
+          <div className="upload-section card">
+            <div className="panel-head">
+              <div>
+                <span className="section-kicker">Upload workspace</span>
+                <h2>Drop, preview, and run detection</h2>
+                <p className="text-muted">Use your own image or load one of the bundled samples to preview the full workflow.</p>
+              </div>
+            </div>
+
+            <ImageUploader
+              onFileSelected={handleFile}
+              previewUrl={previewUrl}
+              onClear={handleClear}
+            />
+
+            {error && <p className="error-msg mt-2">{error}</p>}
+
+            <div className="action-row mt-3">
+              <button
+                className="btn btn-primary"
+                onClick={handleAnalyze}
+                disabled={!file || loading}
+              >
+                {loading ? 'Analyzing...' : 'Analyze Image'}
+              </button>
+
+              <div className="sample-dropdown">
+                <button
+                  className="btn btn-outline"
+                  onClick={() => setSampleMenuOpen((o) => !o)}
+                  disabled={loading}
+                >
+                  Use Sample Image ▾
+                </button>
+                {sampleMenuOpen && (
+                  <div className="sample-menu">
+                    {currentSamples.length === 0 ? (
+                      <div className="sample-empty">No sample images available yet.</div>
+                    ) : (
+                      currentSamples.map((s) => (
+                        <button
+                          key={s.filename}
+                          className="sample-item"
+                          onClick={() => pickSample(s)}
+                        >
+                          <span className="sample-name">{s.filename}</span>
+                          <span className="sample-label">({s.label})</span>
+                        </button>
+                      ))
+                    )}
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+
+          <aside className="card upload-info-panel">
+            <div className="panel-head">
+              <div>
+                <span className="section-kicker">What happens next</span>
+                <h2>Prediction flow</h2>
+              </div>
+            </div>
+
+            <div className="upload-steps">
+              <div><strong>1.</strong><span>Upload or load a scan.</span></div>
+              <div><strong>2.</strong><span>Run the model inference.</span></div>
+              <div><strong>3.</strong><span>Review the explanation and report.</span></div>
+            </div>
+
+            <div className="upload-hint-box">
+              <strong>Supported formats</strong>
+              <p>JPG, PNG, TIFF, BMP up to 10 MB.</p>
+            </div>
+
+            <div className="upload-hint-box upload-hint-box-soft">
+              <strong>Saved locally</strong>
+              <p>Successful screenings appear in the patient dashboard timeline and reports view.</p>
+            </div>
+          </aside>
+        </section>
+
+        <section ref={resultsRef} className="results-section mt-4">
           {loading && <LoadingSpinner message="AI is analyzing your image..." />}
           {!loading && result && <ResultCard result={result} originalPreview={previewUrl} />}
-        </div>
+        </section>
       </div>
     </div>
   );

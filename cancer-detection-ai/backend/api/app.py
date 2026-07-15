@@ -17,6 +17,7 @@ import json
 import os
 import sys
 import traceback
+import threading
 from pathlib import Path
 
 from flask import Flask, jsonify, request, send_file
@@ -54,11 +55,42 @@ app = Flask(__name__)
 app.config["MAX_CONTENT_LENGTH"] = MAX_UPLOAD_BYTES
 CORS(app)  # Allow the React frontend at localhost:3000 to call this API
 
-# Load models once at startup (process-wide singleton)
-print("[INFO] Starting Flask app — initializing CancerDetector...")
 detector = CancerDetector()
-status = detector.load_models()
-print(f"[INFO] Model load status: {status}")
+model_load_status = {
+    "blood_loaded": False,
+    "uterine_loaded": False,
+    "yolo_blood_loaded": False,
+    "yolo_uterine_loaded": False,
+    "mock_mode": True,
+    "loading": True,
+    "error": None,
+}
+
+
+def _load_models_in_background() -> None:
+    """Load the detector models without blocking server startup."""
+    global model_load_status
+    try:
+        print("[INFO] Starting background model initialization...")
+        status = detector.load_models()
+        model_load_status = {**status, "loading": False, "error": None}
+        print(f"[INFO] Model load status: {status}")
+    except Exception as exc:
+        model_load_status = {
+            "blood_loaded": False,
+            "uterine_loaded": False,
+            "yolo_blood_loaded": False,
+            "yolo_uterine_loaded": False,
+            "mock_mode": True,
+            "loading": False,
+            "error": str(exc),
+        }
+        print(f"[ERROR] Background model initialization failed: {exc}")
+        traceback.print_exc()
+
+
+print("[INFO] Starting Flask app — launching model initialization in background...")
+threading.Thread(target=_load_models_in_background, daemon=True).start()
 
 
 # ----------------------------------------------------------------------------
@@ -110,14 +142,14 @@ def _load_model_comparison() -> dict:
 @app.route("/api/health", methods=["GET"])
 def health():
     """Health check endpoint used by the frontend connection indicator."""
-    blood_loaded = detector.blood_model is not None
-    uterine_loaded = detector.uterine_model is not None
     return jsonify({
         "status": "ok",
-        "models_loaded": blood_loaded or uterine_loaded,
-        "blood_model_loaded": blood_loaded,
-        "uterine_model_loaded": uterine_loaded,
-        "mock_mode": not (blood_loaded and uterine_loaded),
+        "models_loaded": not model_load_status.get("loading", False) and not model_load_status.get("mock_mode", True),
+        "blood_model_loaded": model_load_status.get("blood_loaded", False),
+        "uterine_model_loaded": model_load_status.get("uterine_loaded", False),
+        "mock_mode": model_load_status.get("mock_mode", True),
+        "loading": model_load_status.get("loading", False),
+        "error": model_load_status.get("error"),
     })
 
 
@@ -421,4 +453,4 @@ if __name__ == "__main__":
     print("   GET  /api/model-info")
     print("   GET  /api/sample-images")
     print("=" * 60 + "\n")
-    app.run(debug=True, port=5000, host="0.0.0.0")
+    app.run(debug=False, use_reloader=False, port=5000, host="0.0.0.0")

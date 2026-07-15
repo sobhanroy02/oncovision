@@ -25,13 +25,24 @@ function About() {
   useEffect(() => { fetchInfo(); }, [fetchInfo]);
 
   return (
-    <div className="page">
-      <div className="container">
-        <h1 className="page-title">About This Project</h1>
-        <p className="page-subtitle">
-          An end-to-end AI screening tool for two common cancers, built with
-          state-of-the-art deep learning and explainable AI techniques.
-        </p>
+    <div className="page about-page">
+      <div className="container page-shell">
+        <header className="page-header card about-hero">
+          <div className="page-header-row">
+            <div>
+              <div className="page-breadcrumb">Platform / About</div>
+              <h1 className="page-title">About This Project</h1>
+              <p className="page-subtitle">
+                An end-to-end AI screening tool for two common cancers, built with state-of-the-art deep learning and explainable AI techniques.
+              </p>
+            </div>
+            <div className="page-meta-row">
+              <span className="page-meta-chip">Research demo</span>
+              <span className="page-meta-chip">Clinical AI</span>
+              <span className="page-meta-chip">Full stack</span>
+            </div>
+          </div>
+        </header>
 
         <section className="about-section">
           <h2>Project Overview</h2>

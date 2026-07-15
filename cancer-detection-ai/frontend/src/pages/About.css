@@ -1,8 +1,26 @@
+.about-page {
+  background:
+    radial-gradient(circle at top left, rgba(37, 99, 235, 0.05), transparent 28%),
+    radial-gradient(circle at top right, rgba(20, 184, 166, 0.05), transparent 26%),
+    linear-gradient(180deg, #f8fafc 0%, #eef5fb 100%);
+}
+
+.about-hero {
+  margin-bottom: 4px;
+  background:
+    radial-gradient(circle at top right, rgba(37, 99, 235, 0.08), transparent 26%),
+    white;
+}
+
 .about-section { margin-bottom: 48px; }
 .about-section h2 {
   border-left: 4px solid var(--color-accent);
   padding-left: 12px;
   margin-bottom: 16px;
+}
+
+.about-section .card {
+  background: rgba(255, 255, 255, 0.94);
 }
 
 .disclaimer {

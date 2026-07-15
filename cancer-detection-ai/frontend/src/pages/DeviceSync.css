@@ -314,7 +314,7 @@
   border-color: #172554;
 }
 .hw-btn-pair:hover:not(:disabled) { background: #1e40af; }
-.hw-btn-pair.active { background: #2563eb; box-shadow: 0 0 8px #2563eb; }
+.hw-btn-pair.active { background: #1A3C6E; box-shadow: 0 0 8px #1A3C6E; }
 
 .hw-btn-scan {
   background: #14532d; /* Dark green */

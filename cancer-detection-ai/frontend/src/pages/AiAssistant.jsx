@@ -152,12 +152,30 @@ function AiAssistant() {
 
   return (
     <div className="page chat-page">
-      <div className="container chat-container">
+      <div className="container page-shell chat-shell">
+        <header className="page-header card chat-hero">
+          <div className="page-header-row">
+            <div>
+              <div className="page-breadcrumb">Patient Portal / Assistant</div>
+              <h1 className="page-title">Clinical Support Assistant</h1>
+              <p className="page-subtitle">
+                Ask about biomarkers, explainability, device sync, or screening workflows in a guided clinical workspace.
+              </p>
+            </div>
+            <div className="page-meta-row">
+              <span className="page-meta-chip">Guided prompts</span>
+              <span className="page-meta-chip">Clinical context</span>
+              <span className="page-meta-chip">Chat history</span>
+            </div>
+          </div>
+        </header>
+
+        <div className="chat-container">
         
         {/* SIDEBAR FOR QUICK TIPS */}
         <aside className="chat-sidebar card">
           <div className="sidebar-head">
-            <span className="sidebar-badge">Clinical Bot</span>
+            <span className="sidebar-badge">Clinical support</span>
             <h2>OncoBot Companion</h2>
             <p className="text-muted text-sm">
               Your conversational guide for medical parameters, cancer types, deep learning architectures, and explainability.
@@ -182,7 +200,7 @@ function AiAssistant() {
           </div>
 
           <div className="sidebar-disclaimer">
-            <strong>⚠️ Disclaimer</strong>
+            <strong>Disclaimer</strong>
             <p>
               OncoBot is a project screening demonstration. It provides educational answers based on clinical guidelines. Always consult medical experts for real health issues.
             </p>
@@ -198,7 +216,7 @@ function AiAssistant() {
                 <h2>BlinderCare AI Assistant</h2>
                 <span className="status-indicator">
                   <span className="status-blink"></span>
-                  Active Diagnostics Support
+                  Active diagnostics support
                 </span>
               </div>
             </div>
@@ -252,6 +270,8 @@ function AiAssistant() {
               {loading ? "..." : "Send ➔"}
             </button>
           </form>
+
+        </div>
 
         </div>
 
