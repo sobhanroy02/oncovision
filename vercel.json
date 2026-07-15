@@ -1,0 +1,11 @@
+{
+  "installCommand": "npm install --prefix cancer-detection-ai/frontend",
+  "buildCommand": "npm run build --prefix cancer-detection-ai/frontend",
+  "outputDirectory": "cancer-detection-ai/frontend/build",
+  "rewrites": [
+    {
+      "source": "/(.*)",
+      "destination": "/index.html"
+    }
+  ]
+}

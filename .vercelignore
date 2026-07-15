@@ -1,0 +1,12 @@
+.kiro/
+.vscode/
+C-NMC 2019 (PKG)/
+*.docx
+*.pdf
+*.ppt
+*.pptx
+*.txt
+cancer-detection-ai/backend/models/
+cancer-detection-ai/backend/results/
+cancer-detection-ai/data/
+cancer-detection-ai/runs/
