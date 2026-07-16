@@ -1,0 +1,94 @@
+{
+  "run_timestamp": "2026-07-01T10:49:34.141402",
+  "total_samples": 6,
+  "models_loaded": {
+    "blood": false,
+    "uterine": false
+  },
+  "results": [
+    {
+      "filename": "blood_cancer_negative_1.jpg",
+      "cancer_type": "blood",
+      "expected_label": "negative",
+      "prediction": "No Cancer Detected",
+      "confidence": 91.62,
+      "risk_level": "Low",
+      "class_probabilities": {
+        "cancerous": 0.0838,
+        "normal": 0.9162
+      },
+      "gradcam_saved_to": "C:\\Users\\HP\\OneDrive\\Desktop\\geeky-blinders\\cancer-detection-ai\\backend\\results\\sample_predictions\\blood_negative_blood_cancer_negative_1_prediction.png",
+      "mock": true
+    },
+    {
+      "filename": "blood_cancer_positive_1.jpg",
+      "cancer_type": "blood",
+      "expected_label": "positive",
+      "prediction": "No Cancer Detected",
+      "confidence": 91.62,
+      "risk_level": "Low",
+      "class_probabilities": {
+        "cancerous": 0.0838,
+        "normal": 0.9162
+      },
+      "gradcam_saved_to": "C:\\Users\\HP\\OneDrive\\Desktop\\geeky-blinders\\cancer-detection-ai\\backend\\results\\sample_predictions\\blood_positive_blood_cancer_positive_1_prediction.png",
+      "mock": true
+    },
+    {
+      "filename": "blood_cancer_positive_2.jpg",
+      "cancer_type": "blood",
+      "expected_label": "positive",
+      "prediction": "No Cancer Detected",
+      "confidence": 91.62,
+      "risk_level": "Low",
+      "class_probabilities": {
+        "cancerous": 0.0838,
+        "normal": 0.9162
+      },
+      "gradcam_saved_to": "C:\\Users\\HP\\OneDrive\\Desktop\\geeky-blinders\\cancer-detection-ai\\backend\\results\\sample_predictions\\blood_positive_blood_cancer_positive_2_prediction.png",
+      "mock": true
+    },
+    {
+      "filename": "uterine_cancer_negative_1.jpg",
+      "cancer_type": "uterine",
+      "expected_label": "negative",
+      "prediction": "No Cancer Detected",
+      "confidence": 91.62,
+      "risk_level": "Low",
+      "class_probabilities": {
+        "cancerous": 0.0838,
+        "normal": 0.9162
+      },
+      "gradcam_saved_to": "C:\\Users\\HP\\OneDrive\\Desktop\\geeky-blinders\\cancer-detection-ai\\backend\\results\\sample_predictions\\uterine_negative_uterine_cancer_negative_1_prediction.png",
+      "mock": true
+    },
+    {
+      "filename": "uterine_cancer_positive_1.jpg",
+      "cancer_type": "uterine",
+      "expected_label": "positive",
+      "prediction": "No Cancer Detected",
+      "confidence": 91.62,
+      "risk_level": "Low",
+      "class_probabilities": {
+        "cancerous": 0.0838,
+        "normal": 0.9162
+      },
+      "gradcam_saved_to": "C:\\Users\\HP\\OneDrive\\Desktop\\geeky-blinders\\cancer-detection-ai\\backend\\results\\sample_predictions\\uterine_positive_uterine_cancer_positive_1_prediction.png",
+      "mock": true
+    },
+    {
+      "filename": "uterine_cancer_positive_2.jpg",
+      "cancer_type": "uterine",
+      "expected_label": "positive",
+      "prediction": "No Cancer Detected",
+      "confidence": 91.62,
+      "risk_level": "Low",
+      "class_probabilities": {
+        "cancerous": 0.0838,
+        "normal": 0.9162
+      },
+      "gradcam_saved_to": "C:\\Users\\HP\\OneDrive\\Desktop\\geeky-blinders\\cancer-detection-ai\\backend\\results\\sample_predictions\\uterine_positive_uterine_cancer_positive_2_prediction.png",
+      "mock": true
+    }
+  ]
+}
