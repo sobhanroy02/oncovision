@@ -18,10 +18,24 @@ const DEFAULT_API_URL = IS_BROWSER && window.location.hostname === 'localhost'
   ? LOCAL_API_URL
   : PRODUCTION_API_URL;
 
+function sanitizeApiUrl(value) {
+  if (typeof value !== 'string') return null;
+  const trimmed = value.trim();
+  if (!trimmed) return null;
+  // Reject accidental pasted text and malformed values.
+  if (!/^https?:\/\/[^\s]+$/i.test(trimmed)) return null;
+  return trimmed.replace(/\/+$/, '');
+}
+
+function resolveApiUrl() {
+  const envUrl = sanitizeApiUrl(process.env.REACT_APP_API_URL);
+  const windowUrl = sanitizeApiUrl(IS_BROWSER ? window.__API_URL__ : null);
+  const defaultUrl = sanitizeApiUrl(DEFAULT_API_URL);
+  return envUrl || windowUrl || defaultUrl || LOCAL_API_URL;
+}
+
 export const API_URL =
-  process.env.REACT_APP_API_URL ||
-  (IS_BROWSER && window.__API_URL__) ||
-  DEFAULT_API_URL;
+  resolveApiUrl();
 
 const API_SETUP_MESSAGE =
   'Backend API is not configured for production. Set REACT_APP_API_URL in your Vercel project to your deployed backend URL, then redeploy.';
