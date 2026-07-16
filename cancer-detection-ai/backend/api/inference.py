@@ -29,30 +29,47 @@ from typing import Optional
 import cv2
 import numpy as np
 
-# TensorFlow is optional — we use a mock if it isn't installed or models missing
-try:
-    import tensorflow as tf
-    TF_AVAILABLE = True
-except ImportError:
-    TF_AVAILABLE = False
-    print("[WARN] TensorFlow not available — inference will use mock predictions.")
-
-# Ultralytics (YOLOv11) is also optional
-try:
-    from ultralytics import YOLO
-    ULTRALYTICS_AVAILABLE = True
-except ImportError:
-    ULTRALYTICS_AVAILABLE = False
-    print("[WARN] ultralytics not available — YOLOv11 inference disabled.")
-
 BACKEND_DIR = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(BACKEND_DIR))
 
-if TF_AVAILABLE:
-    from tensorflow.keras.applications.efficientnet_v2 import preprocess_input as efficientnetv2_preprocess_input
-else:
-    def efficientnetv2_preprocess_input(x):
-        return x.astype(np.float32) / 255.0
+TF_AVAILABLE = False
+ULTRALYTICS_AVAILABLE = False
+tf = None
+YOLO = None
+
+
+def _ensure_tensorflow():
+    """Import TensorFlow only when model loading or inference actually needs it."""
+    global TF_AVAILABLE, tf
+    if TF_AVAILABLE and tf is not None:
+        return tf
+    try:
+        import tensorflow as _tf  # local import to avoid heavy startup cost
+        tf = _tf
+        TF_AVAILABLE = True
+        return tf
+    except ImportError:
+        TF_AVAILABLE = False
+        return None
+
+
+def _ensure_ultralytics():
+    """Import Ultralytics only when YOLO inference is explicitly enabled."""
+    global ULTRALYTICS_AVAILABLE, YOLO
+    if ULTRALYTICS_AVAILABLE and YOLO is not None:
+        return YOLO
+    try:
+        from ultralytics import YOLO as _YOLO  # local import to avoid startup cost
+        YOLO = _YOLO
+        ULTRALYTICS_AVAILABLE = True
+        return YOLO
+    except ImportError:
+        ULTRALYTICS_AVAILABLE = False
+        return None
+
+
+def efficientnetv2_preprocess_input(x):
+    return x.astype(np.float32) / 255.0
 
 
 # ----------------------------------------------------------------------------
@@ -118,6 +135,9 @@ class CancerDetector:
         Returns:
             Dict with booleans for each model and a 'mock_mode' flag.
         """
+        tf_local = _ensure_tensorflow()
+        yolo_cls = _ensure_ultralytics() if os.environ.get("ENABLE_YOLO", "0") == "1" else None
+
         status = {
             "blood_loaded":         False,
             "uterine_loaded":       False,
@@ -127,44 +147,44 @@ class CancerDetector:
 
         # ---- EfficientNetV2B0 (Keras) ----
         blood_path = BLOOD_MODEL_PATH if BLOOD_MODEL_PATH.exists() else OLD_BLOOD_MODEL_PATH
-        if TF_AVAILABLE and blood_path.exists():
+        if tf_local is not None and blood_path.exists():
             try:
                 print(f"[INFO] Loading blood model: {blood_path}")
-                self.blood_model = tf.keras.models.load_model(str(blood_path))
+                self.blood_model = tf_local.keras.models.load_model(str(blood_path))
                 from explainability.gradcam import GradCAM, resolve_last_conv_layer_name
                 self.blood_gradcam = GradCAM(self.blood_model, resolve_last_conv_layer_name(self.blood_model))
                 status["blood_loaded"] = True
             except Exception as exc:
                 print(f"[ERROR] Failed to load blood model: {exc}")
         else:
-            if not TF_AVAILABLE:
+            if tf_local is None:
                 print("[WARN] TensorFlow not available — blood model skipped.")
             else:
                 print(f"[WARN] Blood model not found at {BLOOD_MODEL_PATH} or {OLD_BLOOD_MODEL_PATH}")
 
         # ---- EfficientNetV2B1 (Keras) ----
         uterine_path = UTERINE_MODEL_PATH if UTERINE_MODEL_PATH.exists() else OLD_UTERINE_MODEL_PATH
-        if TF_AVAILABLE and uterine_path.exists():
+        if tf_local is not None and uterine_path.exists():
             try:
                 print(f"[INFO] Loading uterine model: {uterine_path}")
-                self.uterine_model = tf.keras.models.load_model(str(uterine_path))
+                self.uterine_model = tf_local.keras.models.load_model(str(uterine_path))
                 from explainability.gradcam import GradCAM, resolve_last_conv_layer_name
                 self.uterine_gradcam = GradCAM(self.uterine_model, resolve_last_conv_layer_name(self.uterine_model))
                 status["uterine_loaded"] = True
             except Exception as exc:
                 print(f"[ERROR] Failed to load uterine model: {exc}")
         else:
-            if not TF_AVAILABLE:
+            if tf_local is None:
                 print("[WARN] TensorFlow not available — uterine model skipped.")
             else:
                 print(f"[WARN] Uterine model not found at {UTERINE_MODEL_PATH} or {OLD_UTERINE_MODEL_PATH}")
 
         # ---- YOLOv11 (Ultralytics) ----
-        if ULTRALYTICS_AVAILABLE:
+        if yolo_cls is not None:
             if YOLO_BLOOD_MODEL_PATH.exists():
                 try:
                     print(f"[INFO] Loading YOLOv11 blood: {YOLO_BLOOD_MODEL_PATH}")
-                    self.yolo_blood_model = YOLO(str(YOLO_BLOOD_MODEL_PATH))
+                    self.yolo_blood_model = yolo_cls(str(YOLO_BLOOD_MODEL_PATH))
                     status["yolo_blood_loaded"] = True
                 except Exception as exc:
                     print(f"[ERROR] Failed to load YOLOv11 blood: {exc}")
@@ -272,6 +292,11 @@ class CancerDetector:
         """
         if cancer_type not in ("blood", "uterine"):
             raise ValueError(f"cancer_type must be 'blood' or 'uterine', got '{cancer_type}'")
+
+        # Load models lazily so the web process can start inside small free-tier
+        # memory limits; on-demand loading keeps startup lightweight.
+        if not self._models_loaded:
+            self.load_models()
 
         def display_confidence_for_image(
             image_bytes: bytes,

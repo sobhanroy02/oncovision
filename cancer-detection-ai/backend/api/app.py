@@ -66,6 +66,8 @@ model_load_status = {
     "error": None,
 }
 
+PRELOAD_MODELS = os.environ.get("PRELOAD_MODELS", "0") == "1"
+
 
 def _load_models_in_background() -> None:
     """Load the detector models without blocking server startup."""
@@ -89,8 +91,11 @@ def _load_models_in_background() -> None:
         traceback.print_exc()
 
 
-print("[INFO] Starting Flask app — launching model initialization in background...")
-threading.Thread(target=_load_models_in_background, daemon=True).start()
+if PRELOAD_MODELS:
+    print("[INFO] Starting Flask app — launching model initialization in background...")
+    threading.Thread(target=_load_models_in_background, daemon=True).start()
+else:
+    print("[INFO] Starting Flask app — model preload disabled, loading lazily on demand.")
 
 
 # ----------------------------------------------------------------------------

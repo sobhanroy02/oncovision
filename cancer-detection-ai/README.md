@@ -313,6 +313,16 @@ If the frontend is deployed on Vercel (or any static host), you must set
 `REACT_APP_API_URL` in the hosting environment variables. Otherwise prediction
 calls like `/api/predict` cannot reach the Flask backend and will fail.
 
+For Render/Railway backend deploys, keep model startup lightweight:
+
+```bash
+PRELOAD_MODELS=0
+ENABLE_YOLO=0
+```
+
+This avoids free-tier memory spikes during startup and lets the app load the
+prediction model only when the first request arrives.
+
 The Navbar shows a live **green/red status dot** indicating whether the backend is reachable. It polls `/api/health` every 15 seconds.
 
 ---
