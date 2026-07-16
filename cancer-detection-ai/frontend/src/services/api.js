@@ -16,7 +16,10 @@ const DEFAULT_API_URL = typeof window !== 'undefined' && window.location.hostnam
   ? LOCAL_API_URL
   : '';
 
-export const API_URL = process.env.REACT_APP_API_URL || DEFAULT_API_URL;
+export const API_URL =
+  process.env.REACT_APP_API_URL ||
+  (typeof window !== 'undefined' && window.__API_URL__) ||
+  DEFAULT_API_URL;
 
 const apiClient = axios.create({
   baseURL: API_URL,
@@ -114,9 +117,7 @@ export async function predictCancer(imageFile, cancerType) {
   formData.append('cancer_type', cancerType);
 
   try {
-    const response = await apiClient.post('/api/predict', formData, {
-      headers: { 'Content-Type': 'multipart/form-data' },
-    });
+    const response = await apiClient.post('/api/predict', formData);
     return response.data;
   } catch (err) {
     throw normalizeError(err, 'Prediction request failed');

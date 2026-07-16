@@ -1,6 +1,12 @@
 import { Link } from 'react-router-dom';
+import { useAuth } from './AuthContext';
 
 function Footer() {
+  const { user } = useAuth();
+  const role = user?.role || null;
+  const isDoctor = role === 'doctor';
+  const isPatient = role === 'patient' || !isDoctor;
+
   return (
     <footer className="site-footer">
       <div className="container footer-grid">
@@ -13,8 +19,8 @@ function Footer() {
         </div>
         <div className="footer-links">
           <Link to="/auth">Auth</Link>
-          <Link to="/dashboard">Patient Dashboard</Link>
-          <Link to="/doctor">Doctor Dashboard</Link>
+          {isPatient && <Link to="/dashboard">Patient Dashboard</Link>}
+          {isDoctor && <Link to="/doctor">Doctor Dashboard</Link>}
           <Link to="/detect">AI Detection</Link>
         </div>
       </div>

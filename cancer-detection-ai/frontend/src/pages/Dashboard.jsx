@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
+import { jsPDF } from 'jspdf';
 import {
   BellRing,
   Brain,
@@ -28,6 +29,7 @@ import {
   YAxis,
 } from 'recharts';
 import PortalShell from '../components/PortalShell';
+import ModelComparisonLive from '../components/ModelComparisonLive';
 import { getHealthStatus, getModelInfo } from '../services/api';
 import { clearScreeningHistory, loadScreeningHistory } from '../services/reportStore';
 import { getLatestVitalsRecord, loadVitalsHistory } from '../services/healthStore';
@@ -40,6 +42,7 @@ const sidebarLinks = [
   { to: '/detect', label: 'Cancer Detection', icon: <Microscope size={16} /> },
   { to: '/dashboard#history', label: 'Prediction History', icon: <Clock3 size={16} /> },
   { to: '/dashboard#reports', label: 'Medical Reports', icon: <FileText size={16} /> },
+  { to: '/dashboard#model-comparison', label: 'Model Comparison', icon: <Brain size={16} /> },
   { to: '/dashboard#explainability', label: 'Explainability', icon: <Brain size={16} /> },
   { to: '/device-sync', label: 'Appointments', icon: <HeartPulse size={16} /> },
   { to: '/ai-assistant', label: 'Notifications', icon: <BellRing size={16} /> },
@@ -61,6 +64,134 @@ function formatWhen(value) {
     hour: 'numeric',
     minute: '2-digit',
   });
+}
+
+function openPrintableReport(entry) {
+  if (typeof window === 'undefined' || !entry) return;
+
+  const reportWindow = window.open('', '_blank', 'noopener,noreferrer,width=900,height=700');
+  if (!reportWindow) return;
+
+  const reportDate = formatWhen(entry.createdAt);
+  const confidence = Number.isFinite(entry.confidence) ? `${entry.confidence}%` : '—';
+  const html = `
+    <!doctype html>
+    <html>
+      <head>
+        <title>AI Screening Report</title>
+        <style>
+          body {
+            font-family: Arial, sans-serif;
+            margin: 32px;
+            color: #0f172a;
+          }
+          .card {
+            border: 1px solid #cbd5e1;
+            border-radius: 18px;
+            padding: 24px;
+            max-width: 680px;
+          }
+          h1 {
+            margin: 0 0 10px;
+            font-size: 24px;
+          }
+          p {
+            margin: 8px 0;
+            line-height: 1.5;
+          }
+          .pill {
+            display: inline-block;
+            margin-bottom: 14px;
+            padding: 6px 12px;
+            border-radius: 999px;
+            background: ${entry.riskLevel === 'High' ? '#FEE2E2' : '#D1FAE5'};
+            color: ${entry.riskLevel === 'High' ? '#991B1B' : '#065F46'};
+            font-weight: 700;
+          }
+          .meta {
+            margin-top: 18px;
+            padding-top: 14px;
+            border-top: 1px solid #e2e8f0;
+            color: #475569;
+            font-size: 14px;
+          }
+        </style>
+      </head>
+      <body>
+        <div class="card">
+          <div class="pill">${entry.riskLevel}</div>
+          <h1>${entry.prediction}</h1>
+          <p><strong>Cancer type:</strong> ${entry.cancerType}</p>
+          <p><strong>Confidence:</strong> ${confidence}</p>
+          <p><strong>File:</strong> ${entry.fileName || 'Uploaded scan'}</p>
+          <p><strong>Generated:</strong> ${reportDate}</p>
+          <div class="meta">
+            AI screening report generated from the latest saved dashboard result.
+          </div>
+        </div>
+        <script>
+          window.onload = function () {
+            window.focus();
+            window.print();
+          };
+        </script>
+      </body>
+    </html>
+  `;
+
+  reportWindow.document.open();
+  reportWindow.document.write(html);
+  reportWindow.document.close();
+}
+
+function downloadReportPdf(entry) {
+  if (!entry) return;
+
+  const doc = new jsPDF({ unit: 'pt', format: 'a4' });
+  const pageWidth = doc.internal.pageSize.getWidth();
+  const left = 40;
+  const right = pageWidth - 40;
+  const contentWidth = right - left;
+  const reportDate = formatWhen(entry.createdAt);
+  const confidence = Number.isFinite(entry.confidence) ? `${entry.confidence}%` : '—';
+  const lines = [
+    'AI Screening Report',
+    '',
+    `Risk Level: ${entry.riskLevel || 'Unknown'}`,
+    `Prediction: ${entry.prediction || 'Unknown'}`,
+    `Cancer Type: ${entry.cancerType || 'unknown'}`,
+    `Confidence: ${confidence}`,
+    `File: ${entry.fileName || 'Uploaded scan'}`,
+    `Generated: ${reportDate}`,
+    '',
+    'AI screening report generated from the latest saved dashboard result.',
+  ];
+
+  doc.setFillColor(241, 245, 249);
+  doc.roundedRect(left, 40, contentWidth, 220, 16, 16, 'F');
+  doc.setDrawColor(203, 213, 225);
+  doc.roundedRect(left, 40, contentWidth, 220, 16, 16, 'S');
+
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(22);
+  doc.text(lines[0], left + 24, 78);
+
+  doc.setFontSize(12);
+  doc.setFont('helvetica', 'normal');
+  doc.text(`Risk Level: ${entry.riskLevel || 'Unknown'}`, left + 24, 112);
+  doc.text(`Prediction: ${entry.prediction || 'Unknown'}`, left + 24, 134);
+  doc.text(`Cancer Type: ${entry.cancerType || 'unknown'}`, left + 24, 156);
+  doc.text(`Confidence: ${confidence}`, left + 24, 178);
+  doc.text(`File: ${entry.fileName || 'Uploaded scan'}`, left + 24, 200);
+  doc.text(`Generated: ${reportDate}`, left + 24, 222);
+
+  doc.setFontSize(10);
+  doc.setTextColor(71, 85, 105);
+  const wrapped = doc.splitTextToSize(lines[9], contentWidth - 48);
+  doc.text(wrapped, left + 24, 246);
+
+  const safeName = `${(entry.fileName || 'screening-report').replace(/\.[^.]+$/, '')}-report.pdf`;
+  doc.save(safeName);
 }
 
 function Dashboard() {
@@ -254,8 +385,8 @@ function Dashboard() {
               <h3>{history[0].prediction}</h3>
               <p>{history[0].fileName || 'Uploaded scan'} · Confidence {Number.isFinite(history[0].confidence) ? `${history[0].confidence}%` : '—'}</p>
               <div className="report-actions-inline">
-                <button className="btn btn-secondary">Download PDF</button>
-                <button className="btn btn-outline">Print</button>
+                <button className="btn btn-secondary report-action-btn" onClick={() => downloadReportPdf(history[0])}>Download PDF</button>
+                <button className="btn btn-outline report-action-btn" onClick={() => openPrintableReport(history[0])}>Print</button>
               </div>
             </div>
           ) : (
@@ -264,7 +395,7 @@ function Dashboard() {
         </motion.div>
       </section>
 
-      <section id="explainability" className="dashboard-dual-grid">
+      <section className="dashboard-dual-grid">
         <motion.div className="card dashboard-panel" initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }}>
           <div className="panel-head">
             <div>
@@ -340,6 +471,10 @@ function Dashboard() {
           </div>
         </motion.div>
       </section>
+
+      <motion.div initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }}>
+        <ModelComparisonLive />
+      </motion.div>
     </PortalShell>
   );
 }

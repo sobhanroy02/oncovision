@@ -107,12 +107,6 @@ function ResultCard({ result, originalPreview }) {
         </ResponsiveContainer>
       </div>
 
-      {/* Disclaimer */}
-      <p className="disclaimer">
-        <strong>Disclaimer:</strong> This is an AI screening tool for research and
-        educational purposes. It is <u>not a substitute</u> for professional
-        medical diagnosis. Always consult a qualified medical professional.
-      </p>
     </div>
   );
 }

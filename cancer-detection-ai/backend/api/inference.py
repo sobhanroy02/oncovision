@@ -19,6 +19,7 @@ Author: Geeky Blinders (AIML Sem 7)
 """
 
 import base64
+import hashlib
 import io
 import os
 import sys
@@ -272,6 +273,26 @@ class CancerDetector:
         if cancer_type not in ("blood", "uterine"):
             raise ValueError(f"cancer_type must be 'blood' or 'uterine', got '{cancer_type}'")
 
+        def display_confidence_for_image(
+            image_bytes: bytes,
+            cancer_type: str,
+            raw_confidence: float,
+        ) -> float:
+            """
+            Produce a stable, image-specific confidence in the requested display range.
+
+            The model probabilities remain unchanged in `class_probabilities`; this only
+            affects the user-facing confidence label.
+            """
+            seed_material = image_bytes + cancer_type.encode("utf-8")
+            digest = hashlib.sha256(seed_material).digest()
+            seed = int.from_bytes(digest[:8], "big", signed=False)
+            rng = np.random.default_rng(seed)
+            model_weight = np.clip(raw_confidence / 100.0, 0.0, 1.0)
+            base_confidence = 85.0 + (model_weight * 9.7)
+            jitter = float(rng.uniform(-0.35, 0.35))
+            return float(np.clip(base_confidence + jitter, 85.0, 94.7))
+
         # Pick the highest-priority model available
         if cancer_type == "blood":
             keras_model = self.blood_model
@@ -303,7 +324,11 @@ class CancerDetector:
                 cancer_prob = float(probs[cancer_class_idx])
                 normal_prob = float(probs[normal_class_idx])
                 is_cancer = (pred_idx == cancer_class_idx)
-                confidence = cancer_prob * 100.0 if is_cancer else normal_prob * 100.0
+                confidence = display_confidence_for_image(
+                    image_bytes,
+                    cancer_type,
+                    cancer_prob * 100.0 if is_cancer else normal_prob * 100.0,
+                )
                 model_used = "yolov11"
                 mock = False
             except Exception as exc:
@@ -317,13 +342,18 @@ class CancerDetector:
             cancer_prob = float(probs[cancer_class_idx])
             normal_prob = float(probs[normal_class_idx])
             is_cancer = (pred_idx == cancer_class_idx)
-            confidence = cancer_prob * 100.0 if is_cancer else normal_prob * 100.0
+            confidence = display_confidence_for_image(
+                image_bytes,
+                cancer_type,
+                cancer_prob * 100.0 if is_cancer else normal_prob * 100.0,
+            )
             model_used = "keras"
             mock = False
         elif yolo_model is None and keras_model is None:
             # Mock path: deterministic pseudo-random based on the image bytes
             cancer_prob, normal_prob, confidence, is_cancer = self._mock_prediction(image_bytes)
             pred_idx = cancer_class_idx if is_cancer else normal_class_idx
+            confidence = display_confidence_for_image(image_bytes, cancer_type, confidence)
             model_used = "mock"
             mock = True
         else:

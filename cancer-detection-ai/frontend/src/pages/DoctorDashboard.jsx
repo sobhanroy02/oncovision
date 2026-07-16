@@ -27,6 +27,11 @@ function DoctorDashboard() {
   const vitals = useMemo(() => loadVitalsHistory(), []);
   const [reviewedIds, setReviewedIds] = useState([]);
 
+  // Filter sidebar links to hide patient-only items
+  const filteredSidebarLinks = useMemo(() => {
+    return sidebarLinks.filter((link) => link.label !== 'Patients');
+  }, []);
+
   const metrics = {
     records: screenings.length,
     vitals: vitals.length,
@@ -79,7 +84,7 @@ function DoctorDashboard() {
       subtitle="Review patient cases, inspect explainability, and manage AI-assisted decisions from a hospital-grade clinical workspace."
       sidebarTitle="Doctor Dashboard"
       sidebarNote="Review queue, analytics, and research tools live here."
-      sidebarLinks={sidebarLinks}
+      sidebarLinks={filteredSidebarLinks}
       summaryCards={cards}
       actions={(
         <>
@@ -109,7 +114,53 @@ function DoctorDashboard() {
           <span className="page-meta-chip">Pending reviews</span>
         </div>
       </section>
+      {/* HIGH PRIORITY CASES SECTION */}
+      <section className="doctor-priority-cases">
+        <motion.div className="card doctor-panel" initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }}>
+          <div className="panel-head">
+            <div>
+              <h2>High Priority Cases</h2>
+              <p className="text-muted">Cases requiring immediate clinical attention.</p>
+            </div>
+            {screenings.filter((item) => item.riskLevel === 'High').length > 0 && (
+              <div className="priority-badge">{screenings.filter((item) => item.riskLevel === 'High').length} Critical</div>
+            )}
+          </div>
 
+          <div className="priority-cases-grid">
+            {screenings.filter((item) => item.riskLevel === 'High').length === 0 ? (
+              <p className="empty-state">No critical cases at this moment. All cases are stable.</p>
+            ) : (
+              screenings
+                .filter((item) => item.riskLevel === 'High')
+                .slice(0, 4)
+                .map((item, index) => (
+                  <motion.div
+                    key={item.id || `${item.createdAt}-${index}`}
+                    className="priority-case-card"
+                    initial={{ opacity: 0, scale: 0.95 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                  >
+                    <div className="case-header">
+                      <span className="case-id">Case #{index + 1}</span>
+                      <span className="risk-pill risk-high">High Risk</span>
+                    </div>
+                    <div className="case-details">
+                      <p><strong>Patient:</strong> {item.patientName || 'Patient'}</p>
+                      <p><strong>Age:</strong> {item.age || '—'}</p>
+                      <p><strong>Cancer Type:</strong> {item.cancerType}</p>
+                      <p><strong>Prediction:</strong> {item.prediction}</p>
+                      <p><strong>Confidence:</strong> {Number.isFinite(item.confidence) ? `${item.confidence}%` : '—'}</p>
+                    </div>
+                    <button className="mini-btn" onClick={() => setReviewedIds((ids) => [...new Set([...ids, item.id || `${item.createdAt}-${index}`])])}>
+                      <CheckCircle2 size={14} /> Review Now
+                    </button>
+                  </motion.div>
+                ))
+            )}
+          </div>
+        </motion.div>
+      </section>
       <section className="doctor-top-grid">
         <motion.div className="card doctor-panel" initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }}>
           <div className="panel-head">

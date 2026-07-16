@@ -15,6 +15,9 @@ function Navbar() {
   const [profileOpen, setProfileOpen] = useState(false);
   const { user, logout, isAuthenticated } = useAuth();
   const profileRef = useRef(null);
+  const role = user?.role || null;
+  const isDoctor = role === 'doctor';
+  const isPatient = role === 'patient' || !isDoctor;
 
   const routeLabel = useMemo(() => {
     const pathname = window.location.pathname;
@@ -68,7 +71,7 @@ function Navbar() {
         <div className="nav-brand-block">
           <Link to="/" className="nav-brand">
             <span className="logo-dot" />
-            <span>Geeky Blinders <span className="text-secondary">Health AI</span></span>
+            <span>Oncovision <span className="text-secondary">Health AI</span></span>
           </Link>
           <span className="nav-breadcrumb">{routeLabel}</span>
         </div>
@@ -139,12 +142,20 @@ function Navbar() {
         <div className={`nav-links ${menuOpen ? 'open' : ''}`}>
           <NavLink to="/" end className="nav-link" onClick={() => setMenuOpen(false)}>Home</NavLink>
           <NavLink to="/auth" className="nav-link nav-link-highlight" onClick={() => setMenuOpen(false)}><UserRoundPlus size={16} /> Auth</NavLink>
-          <NavLink to="/dashboard" className="nav-link" onClick={() => setMenuOpen(false)}><LayoutDashboard size={16} /> Patient Dashboard</NavLink>
-          <NavLink to="/doctor" className="nav-link" onClick={() => setMenuOpen(false)}><ShieldCheck size={16} /> Doctor Dashboard</NavLink>
-          <NavLink to="/detect" className="nav-link" onClick={() => setMenuOpen(false)}><Stethoscope size={16} /> Detect</NavLink>
-          <NavLink to="/health-hub" className="nav-link" onClick={() => setMenuOpen(false)}>Health Hub</NavLink>
-          <NavLink to="/device-sync" className="nav-link" onClick={() => setMenuOpen(false)}>Device Sync</NavLink>
-          <NavLink to="/ai-assistant" className="nav-link" onClick={() => setMenuOpen(false)}>AI Assistant</NavLink>
+          {isPatient && (
+            <>
+              <NavLink to="/dashboard" className="nav-link" onClick={() => setMenuOpen(false)}><LayoutDashboard size={16} /> Patient Dashboard</NavLink>
+              <NavLink to="/detect" className="nav-link" onClick={() => setMenuOpen(false)}><Stethoscope size={16} /> Detect</NavLink>
+              <NavLink to="/health-hub" className="nav-link" onClick={() => setMenuOpen(false)}>Health Hub</NavLink>
+              <NavLink to="/device-sync" className="nav-link" onClick={() => setMenuOpen(false)}>Device Sync</NavLink>
+            </>
+          )}
+          {isDoctor && (
+            <>
+              <NavLink to="/doctor" className="nav-link" onClick={() => setMenuOpen(false)}><ShieldCheck size={16} /> Doctor Dashboard</NavLink>
+              <NavLink to="/ai-assistant" className="nav-link" onClick={() => setMenuOpen(false)}>AI Assistant</NavLink>
+            </>
+          )}
           <NavLink to="/about" className="nav-link" onClick={() => setMenuOpen(false)}>About</NavLink>
 
           <div className="nav-status" title={backendOnline === null ? 'Checking...' : backendOnline ? 'Backend connected' : 'Backend offline'}>

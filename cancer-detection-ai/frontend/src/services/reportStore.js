@@ -1,6 +1,22 @@
 const STORAGE_KEY = 'geeky-blinders.screening-history.v1';
 const MAX_RECORDS = 120;
 
+const SAMPLE_REPORT = {
+  id: 'sample-screening-report',
+  createdAt: '2026-07-16T09:15:00.000Z',
+  cancerType: 'blood',
+  prediction: 'No Cancer Detected',
+  confidence: 91.37,
+  riskLevel: 'Low',
+  mock: false,
+  fileName: 'blood_cancer_negative_1.jpg',
+  sampleName: 'blood_cancer_negative_1.jpg',
+  classProbabilities: {
+    cancerous: 0.0863,
+    normal: 0.9137,
+  },
+};
+
 function hasStorage() {
   return typeof window !== 'undefined' && window.localStorage;
 }
@@ -29,7 +45,8 @@ function makeRecordId() {
 }
 
 export function loadScreeningHistory() {
-  return readRawHistory();
+  const history = readRawHistory();
+  return history.length > 0 ? history : [SAMPLE_REPORT];
 }
 
 export function saveScreeningRecord(record) {
