@@ -86,6 +86,10 @@ function Detect() {
 
   async function handleAnalyze() {
     if (!file) { setError('Please select an image first.'); return; }
+    if (!API_URL && typeof window !== 'undefined' && window.location.hostname !== 'localhost') {
+      setError('Prediction failed: Backend API is not configured for production. Set REACT_APP_API_URL in Vercel and redeploy.');
+      return;
+    }
     setLoading(true);
     setError('');
     setResult(null);
