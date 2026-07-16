@@ -20,7 +20,6 @@ import {
   Bar,
   BarChart,
   CartesianGrid,
-  Cell,
   Legend,
   PolarAngleAxis,
   PolarGrid,
