@@ -34,6 +34,41 @@ const apiClient = axios.create({
   },
 });
 
+function sleep(ms) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+function isTransientApiError(err) {
+  if (!err) return false;
+  if (err.isNetworkError) return true;
+  if (err.status === 429) return true;
+  if (typeof err.status === 'number' && err.status >= 500) return true;
+  if (/timed out|cannot reach the backend|network/i.test(String(err.message || ''))) return true;
+  return false;
+}
+
+async function withRetry(requestFn, {
+  retries = 2,
+  baseDelayMs = 800,
+  fallbackMessage = 'Request failed',
+} = {}) {
+  let lastErr;
+  for (let attempt = 0; attempt <= retries; attempt += 1) {
+    try {
+      return await requestFn();
+    } catch (rawErr) {
+      const normalized = rawErr instanceof ApiError ? rawErr : normalizeError(rawErr, fallbackMessage);
+      lastErr = normalized;
+      if (attempt === retries || !isTransientApiError(normalized)) {
+        throw normalized;
+      }
+      const backoff = baseDelayMs * (attempt + 1);
+      await sleep(backoff);
+    }
+  }
+  throw lastErr || new ApiError(fallbackMessage);
+}
+
 /**
  * Custom error class so the UI can distinguish network vs server errors
  * and show a user-friendly message.
@@ -132,12 +167,14 @@ export async function predictCancer(imageFile, cancerType) {
   formData.append('image', imageFile);
   formData.append('cancer_type', cancerType);
 
-  try {
+  return withRetry(async () => {
     const response = await apiClient.post('/api/predict', formData);
     return response.data;
-  } catch (err) {
-    throw normalizeError(err, 'Prediction request failed');
-  }
+  }, {
+    retries: 2,
+    baseDelayMs: 1000,
+    fallbackMessage: 'Prediction request failed',
+  });
 }
 
 /**
@@ -160,12 +197,14 @@ export async function getModelInfo() {
  * @throws {ApiError}
  */
 export async function getSampleImages() {
-  try {
+  return withRetry(async () => {
     const r = await apiClient.get('/api/sample-images');
     return r.data;
-  } catch (err) {
-    throw normalizeError(err, 'Failed to fetch sample images');
-  }
+  }, {
+    retries: 3,
+    baseDelayMs: 900,
+    fallbackMessage: 'Failed to fetch sample images',
+  });
 }
 
 /**

@@ -8,7 +8,7 @@
  *   - "Analyze Image" button (POSTs to /api/predict)
  *   - Result display with original + Grad-CAM side-by-side
  */
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import ImageUploader from '../components/ImageUploader';
 import ResultCard from '../components/ResultCard';
@@ -28,6 +28,7 @@ function Detect() {
   const [result, setResult] = useState(null);
   const [error, setError] = useState('');
   const [samples, setSamples] = useState({ blood: [], uterine: [] });
+  const [samplesError, setSamplesError] = useState('');
   const [sampleMenuOpen, setSampleMenuOpen] = useState(false);
 
   const resultsRef = useRef(null);
@@ -37,12 +38,21 @@ function Detect() {
     setSearchParams({ type: cancerType });
   }, [cancerType, setSearchParams]);
 
+  const loadSamples = useCallback(async () => {
+    try {
+      setSamplesError('');
+      const d = await getSampleImages();
+      setSamples(d.samples || { blood: [], uterine: [] });
+    } catch (e) {
+      setSamples({ blood: [], uterine: [] });
+      setSamplesError(e?.message || 'Failed to load sample images.');
+    }
+  }, []);
+
   // Fetch samples once
   useEffect(() => {
-    getSampleImages()
-      .then((d) => setSamples(d.samples || { blood: [], uterine: [] }))
-      .catch(() => setSamples({ blood: [], uterine: [] }));
-  }, []);
+    loadSamples();
+  }, [loadSamples]);
 
   // Clean up object URLs to avoid memory leaks
   useEffect(() => {
@@ -66,20 +76,27 @@ function Detect() {
   }
 
   async function pickSample(sample) {
+    let timeoutId;
     try {
       setError('');
       setLoading(true);
       setSampleMenuOpen(false);
 
-      const url = `${API_URL}${sample.url}`;
-      const response = await fetch(url);
+      const url = sample.url.startsWith('http') ? sample.url : `${API_URL}${sample.url}`;
+      const controller = new AbortController();
+      timeoutId = setTimeout(() => controller.abort(), 30000);
+      const response = await fetch(url, { signal: controller.signal });
       if (!response.ok) throw new Error('Failed to download sample image');
       const blob = await response.blob();
       const fetchedFile = new File([blob], sample.filename, { type: blob.type });
       handleFile(fetchedFile);
     } catch (e) {
-      setError('Failed to load sample image: ' + e.message);
+      const msg = e?.name === 'AbortError'
+        ? 'Sample image download timed out. Please try again.'
+        : (e?.message || 'Unknown error');
+      setError('Failed to load sample image: ' + msg);
     } finally {
+      if (timeoutId) clearTimeout(timeoutId);
       setLoading(false);
     }
   }
@@ -213,7 +230,10 @@ function Detect() {
               <div className="sample-dropdown">
                 <button
                   className="btn btn-outline"
-                  onClick={() => setSampleMenuOpen((o) => !o)}
+                  onClick={() => {
+                    if ((samples[cancerType] || []).length === 0) loadSamples();
+                    setSampleMenuOpen((o) => !o);
+                  }}
                   disabled={loading}
                 >
                   Use Sample Image ▾
@@ -221,7 +241,9 @@ function Detect() {
                 {sampleMenuOpen && (
                   <div className="sample-menu">
                     {currentSamples.length === 0 ? (
-                      <div className="sample-empty">No sample images available yet.</div>
+                      <div className="sample-empty">
+                        {samplesError ? `Could not load samples: ${samplesError}` : 'No sample images available yet.'}
+                      </div>
                     ) : (
                       currentSamples.map((s) => (
                         <button
