@@ -12,10 +12,11 @@
 import axios from 'axios';
 
 const LOCAL_API_URL = 'http://localhost:5000';
+const PRODUCTION_API_URL = 'https://oncovision-backend-iics.onrender.com';
 const IS_BROWSER = typeof window !== 'undefined';
 const DEFAULT_API_URL = IS_BROWSER && window.location.hostname === 'localhost'
   ? LOCAL_API_URL
-  : '';
+  : PRODUCTION_API_URL;
 
 export const API_URL =
   process.env.REACT_APP_API_URL ||
