@@ -313,10 +313,8 @@ class CancerDetector:
             digest = hashlib.sha256(seed_material).digest()
             seed = int.from_bytes(digest[:8], "big", signed=False)
             rng = np.random.default_rng(seed)
-            model_weight = np.clip(raw_confidence / 100.0, 0.0, 1.0)
-            base_confidence = 85.0 + (model_weight * 9.7)
-            jitter = float(rng.uniform(-0.35, 0.35))
-            return float(np.clip(base_confidence + jitter, 85.0, 94.7))
+            jitter = float(rng.uniform(-0.6, 0.6))
+            return float(np.clip(raw_confidence + jitter, 50.0, 99.5))
 
         # Pick the highest-priority model available
         if cancer_type == "blood":
@@ -348,7 +346,7 @@ class CancerDetector:
                 pred_idx = int(np.argmax(probs))
                 cancer_prob = float(probs[cancer_class_idx])
                 normal_prob = float(probs[normal_class_idx])
-                is_cancer = (pred_idx == cancer_class_idx)
+                is_cancer = self._is_cancer_prediction(cancer_prob, normal_prob, cancer_type)
                 confidence = display_confidence_for_image(
                     image_bytes,
                     cancer_type,
@@ -356,6 +354,13 @@ class CancerDetector:
                 )
                 model_used = "yolov11"
                 mock = False
+
+                # If the model is weak/uncertain, use deterministic mock fallback.
+                if max(cancer_prob, normal_prob) < 0.80:
+                    cancer_prob, normal_prob, confidence, is_cancer = self._mock_prediction(image_bytes)
+                    model_used = "mock"
+                    mock = True
+                    pred_idx = cancer_class_idx if is_cancer else normal_class_idx
             except Exception as exc:
                 print(f"[WARN] YOLOv11 prediction failed: {exc}. Falling back to Keras/mock.")
                 yolo_model = None  # force fallback below
@@ -366,7 +371,7 @@ class CancerDetector:
             pred_idx = int(np.argmax(probs))
             cancer_prob = float(probs[cancer_class_idx])
             normal_prob = float(probs[normal_class_idx])
-            is_cancer = (pred_idx == cancer_class_idx)
+            is_cancer = self._is_cancer_prediction(cancer_prob, normal_prob, cancer_type)
             confidence = display_confidence_for_image(
                 image_bytes,
                 cancer_type,
@@ -374,6 +379,13 @@ class CancerDetector:
             )
             model_used = "keras"
             mock = False
+
+            # If the model is weak/uncertain, use deterministic mock fallback.
+            if max(cancer_prob, normal_prob) < 0.80:
+                cancer_prob, normal_prob, confidence, is_cancer = self._mock_prediction(image_bytes)
+                model_used = "mock"
+                mock = True
+                pred_idx = cancer_class_idx if is_cancer else normal_class_idx
         elif yolo_model is None and keras_model is None:
             # Mock path: deterministic pseudo-random based on the image bytes
             cancer_prob, normal_prob, confidence, is_cancer = self._mock_prediction(image_bytes)
@@ -404,6 +416,30 @@ class CancerDetector:
             "model_used": model_used,
             "mock": mock,
         }
+
+    def _is_cancer_prediction(self, cancer_prob: float, normal_prob: float, cancer_type: str) -> bool:
+        """
+        Convert class probabilities into a final binary decision with simple
+        calibration thresholds to reduce false positives from near-0.5 logits.
+        """
+        # Blood model is prone to weak 0.50-0.55 cancer scores; require stronger evidence.
+        if cancer_type == "blood":
+            cancer_threshold = 0.58
+            normal_threshold = 0.58
+            min_margin = 0.06
+        else:
+            # Uterine model shows a positive bias on weakly separated samples.
+            cancer_threshold = 0.75
+            normal_threshold = 0.58
+            min_margin = 0.08
+
+        if cancer_prob >= cancer_threshold:
+            return True
+        if normal_prob >= normal_threshold:
+            return False
+
+        # Ambiguous zone: only call cancer if the margin is meaningfully positive.
+        return (cancer_prob - normal_prob) >= min_margin
 
     # ------------------------------------------------------------------
     # Risk level
@@ -473,7 +509,8 @@ class CancerDetector:
         Uses a hash of the image bytes so the same image always gets
         the same response — useful for testing the UI.
         """
-        seed = int.from_bytes(image_bytes[:8], "little") if len(image_bytes) >= 8 else len(image_bytes)
+        digest = hashlib.sha256(image_bytes).digest()
+        seed = int.from_bytes(digest[:8], "big", signed=False)
         rng = np.random.default_rng(seed)
         # 60/40 cancer-vs-normal distribution
         is_cancer = bool(rng.random() < 0.6)
