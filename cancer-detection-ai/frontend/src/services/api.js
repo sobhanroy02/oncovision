@@ -12,14 +12,18 @@
 import axios from 'axios';
 
 const LOCAL_API_URL = 'http://localhost:5000';
-const DEFAULT_API_URL = typeof window !== 'undefined' && window.location.hostname === 'localhost'
+const IS_BROWSER = typeof window !== 'undefined';
+const DEFAULT_API_URL = IS_BROWSER && window.location.hostname === 'localhost'
   ? LOCAL_API_URL
   : '';
 
 export const API_URL =
   process.env.REACT_APP_API_URL ||
-  (typeof window !== 'undefined' && window.__API_URL__) ||
+  (IS_BROWSER && window.__API_URL__) ||
   DEFAULT_API_URL;
+
+const API_SETUP_MESSAGE =
+  'Backend API is not configured for production. Set REACT_APP_API_URL in your Vercel project to your deployed backend URL, then redeploy.';
 
 const apiClient = axios.create({
   baseURL: API_URL,
@@ -48,6 +52,15 @@ export class ApiError extends Error {
  */
 function normalizeError(err, fallbackMessage) {
   if (err.response) {
+    const contentType = String(err.response.headers?.['content-type'] || '').toLowerCase();
+    const gotHtmlResponse = contentType.includes('text/html');
+
+    // In production, an HTML response usually means /api was routed to the SPA page,
+    // not to the Flask backend.
+    if (gotHtmlResponse && !API_URL) {
+      return new ApiError(API_SETUP_MESSAGE, { status: err.response.status });
+    }
+
     // Server responded with a non-2xx status
     const serverMsg =
       err.response.data?.error ||
@@ -61,7 +74,9 @@ function normalizeError(err, fallbackMessage) {
     const isTimeout = err.code === 'ECONNABORTED';
     const msg = isTimeout
       ? 'Request timed out. The server took too long to respond.'
-      : 'Cannot reach the backend. Make sure the Flask server is running on ' + API_URL;
+      : !API_URL
+        ? API_SETUP_MESSAGE
+        : 'Cannot reach the backend. Make sure the Flask server is running on ' + API_URL;
     return new ApiError(msg, { code: err.code, isNetworkError: true });
   }
   // Something else (programming error, etc.)

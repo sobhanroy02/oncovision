@@ -309,6 +309,10 @@ REACT_APP_API_URL=http://localhost:5000
 # REACT_APP_API_URL=https://your-api-domain.com
 ```
 
+If the frontend is deployed on Vercel (or any static host), you must set
+`REACT_APP_API_URL` in the hosting environment variables. Otherwise prediction
+calls like `/api/predict` cannot reach the Flask backend and will fail.
+
 The Navbar shows a live **green/red status dot** indicating whether the backend is reachable. It polls `/api/health` every 15 seconds.
 
 ---
